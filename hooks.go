@@ -48,6 +48,8 @@ func registerSession() error {
 	if BConfig.WebConfig.Session.SessionOn {
 		var err error
 		sessionConfig := AppConfig.String("sessionConfig")
+		// fmt.Printf("sessionConfig: %s \n", sessionConfig)
+		// fmt.Printf("BConfig.WebConfig.Session: %#v \n", BConfig.WebConfig.Session)
 		conf := new(session.ManagerConfig)
 		if sessionConfig == "" {
 			conf.CookieName = BConfig.WebConfig.Session.SessionName

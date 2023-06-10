@@ -177,6 +177,14 @@ func (manager *Manager) GetProvider() Provider {
 // sid is empty when need to generate a new session id
 // otherwise return an valid session id.
 func (manager *Manager) getSid(r *http.Request) (string, error) {
+	// 优先从header中获取
+	if manager.config.EnableSidInHTTPHeader {
+		sids, isFound := r.Header[manager.config.SessionNameInHTTPHeader]
+		if isFound && len(sids) != 0 {
+			return sids[0], nil
+		}
+	}
+
 	cookie, errs := r.Cookie(manager.config.CookieName)
 	if errs != nil || cookie.Value == "" {
 		var sid string
@@ -187,14 +195,6 @@ func (manager *Manager) getSid(r *http.Request) (string, error) {
 			}
 
 			sid = r.FormValue(manager.config.CookieName)
-		}
-
-		// if not found in Cookie / param, then read it from request headers
-		if manager.config.EnableSidInHTTPHeader && sid == "" {
-			sids, isFound := r.Header[manager.config.SessionNameInHTTPHeader]
-			if isFound && len(sids) != 0 {
-				return sids[0], nil
-			}
 		}
 
 		return sid, nil
